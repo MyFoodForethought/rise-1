@@ -16,8 +16,9 @@
 
 // export default sequelize;
 
-
 import { Sequelize } from 'sequelize';
+import dns from 'dns';
+import { promisify } from 'util';
 
 const dbName = process.env.POSTGRES_DB || 'railway';
 const dbUser = process.env.POSTGRES_USER || 'postgres';
@@ -25,39 +26,53 @@ const dbHost = process.env.PGHOST || '';
 const dbPassword = process.env.POSTGRES_PASSWORD || '';
 const dbPort = parseInt(process.env.PGPORT || '5432');
 
-const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
-  host: dbHost,
-  port: dbPort,
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    },
-    connectTimeout: 60000 // Increase timeout to 60 seconds
-  },
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 60000,
-    idle: 10000
-  },
-  logging: false,
-  retry: {
-    max: 5, // Maximum retry 5 times
-    timeout: 3000 // Retry every 3 seconds
+const dnsLookup = promisify(dns.lookup);
+
+const createSequelizeInstance = async () => {
+  let host = dbHost;
+  try {
+    const { address } = await dnsLookup(dbHost, { family: 4 });
+    host = address;
+    console.log(`Resolved host to IPv4 address: ${host}`);
+  } catch (error) {
+    console.error('Failed to resolve host to IPv4:', error);
   }
-});
+
+  return new Sequelize(dbName, dbUser, dbPassword, {
+    host: host,
+    port: dbPort,
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      },
+      connectTimeout: 60000
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 60000,
+      idle: 10000
+    },
+    logging: console.log,  // Enable logging for debugging
+    retry: {
+      max: 5,
+      timeout: 3000
+    }
+  });
+};
 
 const testConnection = async () => {
+  const sequelize = await createSequelizeInstance();
   try {
     await sequelize.authenticate();
     console.log('Database connected successfully.');
+    return sequelize;
   } catch (error) {
     console.error('Unable to connect to the database:', error);
     throw error;
   }
 };
 
-export default sequelize;
-export { testConnection };
+export { createSequelizeInstance, testConnection };

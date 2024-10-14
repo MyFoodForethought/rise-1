@@ -1,15 +1,15 @@
-// src/sync.ts
-import sequelize from '../config/db'; // Adjust if necessary
+import { Sequelize } from 'sequelize';
 import User from '../../models/User'; // Ensure these paths are correct
 import Post from '../../models/Posts';
 import Comment from '../../models/Comments';
 
-const syncDatabase = async () => {
+const syncDatabase = async (sequelize: Sequelize) => {
   try {
-    await sequelize.sync({ alter: true }); // Use { force: true } if you want to drop tables first
-    console.log('Database synced successfully.');
+    await sequelize.sync({ force: false });
+    console.log('Database synced successfully');
   } catch (error) {
     console.error('Error syncing database:', error);
+    throw error;
   }
 };
 
