@@ -19,28 +19,32 @@
 
 import { Sequelize } from 'sequelize';
 
-// Connect to the Railway PostgreSQL database using environment variables
-const sequelize = new Sequelize(
-  process.env.DATABASE_URL || `postgresql://${process.env.PGUSER}:${process.env.POSTGRES_PASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`,
-  {
-    dialect: 'postgres',
-    logging: false, // Disable logging for production
-    dialectOptions: {
-      ssl: {
-        require: true, // Ensure SSL connection
-        rejectUnauthorized: false, // Avoid SSL certificate verification errors
-      },
-    },
-  }
-);
+const dbName = process.env.POSTGRES_DB || 'railway';
+const dbUser = process.env.POSTGRES_USER || 'postgres';
+const dbHost = process.env.PGHOST || '';
+const dbPassword = process.env.POSTGRES_PASSWORD || '';
+const dbPort = parseInt(process.env.PGPORT || '5432');
 
-// Function to test the connection
+const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
+  host: dbHost,
+  port: dbPort,
+  dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  },
+  logging: false
+});
+
 const testConnection = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connected successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
+    throw error;
   }
 };
 
