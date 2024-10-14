@@ -33,9 +33,20 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
     ssl: {
       require: true,
       rejectUnauthorized: false
-    }
+    },
+    connectTimeout: 60000 // Increase timeout to 60 seconds
   },
-  logging: false
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 60000,
+    idle: 10000
+  },
+  logging: false,
+  retry: {
+    max: 5, // Maximum retry 5 times
+    timeout: 3000 // Retry every 3 seconds
+  }
 });
 
 const testConnection = async () => {
