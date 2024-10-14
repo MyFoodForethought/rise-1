@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - '5000:4000'
+    environment:
+      DB_DATABASE: senior_backend_test
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      DB_HOST: db  # Change this to the service name
+      DB_DIALECT: postgres
+    depends_on:
+      - db  # Ensure app starts after db
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: senior_backend_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - '5432:5432'
