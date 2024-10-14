@@ -21,6 +21,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
     res.status(201).json({ user: newUser, token });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error creating user', error });
   }
 };
@@ -30,6 +31,7 @@ export const getUsers = async (_req: Request, res: Response): Promise<void> => {
     const users = await UserModel.findAll();
     res.status(200).json(users);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error retrieving users', error });
   }
 };
@@ -39,6 +41,7 @@ export const getTopUsersWithLatestComments = async (_req: Request, res: Response
     const topUsers = await getTopUsersWithLatestCommentsQuery();
     res.status(200).json(topUsers);
   } catch (error) {
+    console.log(error)
     if (error instanceof Error) {
       res.status(500).json({ message: `Error retrieving top users: ${error.message}` });
     } else {
@@ -61,6 +64,7 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
     const newPost = await Post.create({ userId, title, content });
     res.status(201).json(newPost);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error creating post', error });
   }
 };
@@ -72,6 +76,7 @@ export const getUserPosts = async (req: Request, res: Response): Promise<void> =
     const posts = await Post.findAll({ where: { userId: id } });
     res.status(200).json(posts);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error retrieving posts', error });
   }
 };
@@ -97,6 +102,7 @@ export const addComment = async (req: Request, res: Response): Promise<void> => 
     const newComment = await Comment.create({ postId, content, userId });
     res.status(201).json(newComment);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error adding comment', error });
   }
 };
