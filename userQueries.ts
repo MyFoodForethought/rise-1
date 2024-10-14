@@ -1,4 +1,4 @@
-import sequelize from './src/config/db'; // Adjust the path to your db config if necessary
+import {sequelize} from './src/config/db'; // Adjust the path to your db config if necessary
 
 // Query to get the top 3 users with the most posts and their latest comment
 export const getTopUsersWithLatestCommentsQuery = async () => {
