@@ -15,7 +15,6 @@
 // });
 
 // export default sequelize;
-
 import { Sequelize } from 'sequelize';
 import dns from 'dns';
 import { promisify } from 'util';
@@ -28,7 +27,7 @@ const dbPort = parseInt(process.env.PGPORT || '5432');
 
 const dnsLookup = promisify(dns.lookup);
 
-const createSequelizeInstance = async () => {
+export const createSequelizeInstance = async () => {
   let host = dbHost;
   try {
     const { address } = await dnsLookup(dbHost, { family: 4 });
@@ -64,16 +63,29 @@ const createSequelizeInstance = async () => {
   });
 };
 
-const testConnection = async () => {
-  const sequelize = await createSequelizeInstance();
-  try {
-    await sequelize.authenticate();
-    console.log('Database connected successfully.');
-    return sequelize;
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-    throw error;
+// Export the Sequelize instance directly
+export const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
+  host: dbHost,
+  port: dbPort,
+  dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    },
+    connectTimeout: 60000
+  },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 60000,
+    idle: 10000
+  },
+  logging: console.log,
+  retry: {
+    max: 5,
+    timeout: 3000
   }
-};
+});
 
-export { createSequelizeInstance, testConnection };
+export default sequelize;

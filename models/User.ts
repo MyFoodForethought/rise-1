@@ -1,6 +1,6 @@
 // models/User.ts
 import { Model, DataTypes } from 'sequelize';
-import sequelize from '../src/config/db'; // Adjust the path according to your project structure
+import {sequelize} from '../src/config/db'; // Adjust the path according to your project structure
 
 class User extends Model {
   public id!: number;

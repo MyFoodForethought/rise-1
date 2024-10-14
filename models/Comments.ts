@@ -1,6 +1,6 @@
 // models/Comment.ts
 import { Model, DataTypes } from 'sequelize';
-import sequelize from '../src/config/db';
+import {sequelize} from '../src/config/db';
 import Post from './Posts';
 
 class Comment extends Model {
