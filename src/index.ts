@@ -81,7 +81,7 @@ dotenv.config();
 
 import express, { Request, Response } from 'express';
 import http from 'http';
-import { createSequelizeInstance, testConnection } from './config/db';
+import { createSequelizeInstance } from './config/db';
 import syncDatabase from './config/sync';
 import routes from './routes/routes';
 import swaggerUi from 'swagger-ui-express';
@@ -113,7 +113,8 @@ const startServer = async () => {
   while (retries) {
     try {
       console.log('Attempting to connect to the database...');
-      const sequelize = await testConnection();
+      const sequelize = await createSequelizeInstance();
+      await sequelize.authenticate();
       console.log('Database connection successful');
 
       // Log all non-sensitive environment variables

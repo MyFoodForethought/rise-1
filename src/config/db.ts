@@ -22,7 +22,7 @@ import { promisify } from 'util';
 
 const dbName = process.env.POSTGRES_DB || 'railway';
 const dbUser = process.env.POSTGRES_USER || 'postgres';
-const dbHost = process.env.PGHOST || '';
+const dbHost = process.env.PGHOST || 'localhost';
 const dbPassword = process.env.POSTGRES_PASSWORD || '';
 const dbPort = parseInt(process.env.PGPORT || '5432');
 
@@ -36,6 +36,7 @@ const createSequelizeInstance = async () => {
     console.log(`Resolved host to IPv4 address: ${host}`);
   } catch (error) {
     console.error('Failed to resolve host to IPv4:', error);
+    // Fallback to original host if DNS lookup fails
   }
 
   return new Sequelize(dbName, dbUser, dbPassword, {
@@ -55,7 +56,7 @@ const createSequelizeInstance = async () => {
       acquire: 60000,
       idle: 10000
     },
-    logging: console.log,  // Enable logging for debugging
+    logging: console.log,
     retry: {
       max: 5,
       timeout: 3000
