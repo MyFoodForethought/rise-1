@@ -81,7 +81,7 @@ dotenv.config();
 
 import express, { Request, Response } from 'express';
 import http from 'http';
-import { createSequelizeInstance } from './config/db';
+import { sequelize } from './config/db';
 import syncDatabase from './config/sync';
 import routes from './routes/routes';
 import swaggerUi from 'swagger-ui-express';
@@ -113,7 +113,6 @@ const startServer = async () => {
   while (retries) {
     try {
       console.log('Attempting to connect to the database...');
-      const sequelize = await createSequelizeInstance();
       await sequelize.authenticate();
       console.log('Database connection successful');
 
@@ -160,7 +159,10 @@ process.on('SIGTERM', () => {
     server.close(() => {
       console.log('HTTP server closed');
       // Close database connection here if needed
-      process.exit(0);
+      sequelize.close().then(() => {
+        console.log('Database connection closed');
+        process.exit(0);
+      });
     });
   } else {
     console.log('HTTP server not running');
